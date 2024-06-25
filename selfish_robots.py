@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import time
 
 pygame.init()
 
@@ -92,6 +93,8 @@ target_x, target_y = WIDTH - TARGET_SIZE, 0
 running = True
 clock = pygame.time.Clock()
 
+start_time = time.time()
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -113,9 +116,10 @@ while running:
         else:
             robot.speed = 0
         robot.draw()
-
+    
     if all_robots_on_target:
-        print("All robots have found the target!")
+        end_time = time.time()
+        print(f"All robots have found the target in {end_time - start_time:.2f} seconds!")
         running = False
 
     pygame.display.flip()
