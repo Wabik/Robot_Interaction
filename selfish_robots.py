@@ -18,7 +18,8 @@ VIEW_COLOR = (200, 200, 200, 100)
 ROBOT_SIZE = 20
 SPEED = 2
 TURN_SPEED = 0.1
-VIEW_DISTANCE = 150  
+VIEW_DISTANCE = 150
+VIEW_ANGLE = 76
 
 class Robot:
     def __init__(self, x, y, color):
@@ -55,21 +56,37 @@ class Robot:
 
     def draw(self):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
-        pygame.draw.circle(screen, VIEW_COLOR, (int(self.x), int(self.y)), VIEW_DISTANCE, 1)
+        self.draw_visibility_arc()
+
+    def draw_visibility_arc(self):
+        end_angle1 = self.angle - VIEW_ANGLE / 2
+        end_angle2 = self.angle + VIEW_ANGLE / 2
+        points = [(self.x, self.y)]
+        for angle in [end_angle1, end_angle2]:
+            dx = self.x + VIEW_DISTANCE * math.cos(angle)
+            dy = self.y + VIEW_DISTANCE * math.sin(angle)
+            points.append((dx, dy))
+        pygame.draw.polygon(screen, VIEW_COLOR, points, 0)
         
     def is_on_target(self, target_x, target_y, target_size):
         return abs(self.x - (target_x + target_size // 2)) < target_size // 2 and abs(self.y - (target_y + target_size // 2)) < target_size // 2
 
     def can_see_target(self, target_x, target_y, target_size):
         distance = math.sqrt((self.x - (target_x + target_size / 2)) ** 2 + (self.y - (target_y + target_size / 2)) ** 2)
-        return distance <= VIEW_DISTANCE
+        if distance <= VIEW_DISTANCE:
+            target_angle = math.atan2(target_y + target_size / 2 - self.y, target_x + target_size / 2 - self.x)
+            angle_diff = (target_angle - self.angle) % (2 * math.pi)
+            if angle_diff > math.pi:
+                angle_diff -= 2 * math.pi
+            return -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2
+        return False
 
 robots = [
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), RED),
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), BLUE)
 ]
 
-TARGET_SIZE = 60  
+TARGET_SIZE = 60 
 target_x, target_y = WIDTH - TARGET_SIZE, 0
 
 running = True
@@ -88,7 +105,6 @@ while running:
     for robot in robots:
         if not robot.is_on_target(target_x, target_y, TARGET_SIZE):
             if robot.can_see_target(target_x, target_y, TARGET_SIZE):
-
                 robot.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
             else:
                 robot.rotate_randomly()
@@ -97,7 +113,7 @@ while running:
         else:
             robot.speed = 0
         robot.draw()
-    
+
     if all_robots_on_target:
         print("All robots have found the target!")
         running = False
