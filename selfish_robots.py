@@ -17,6 +17,9 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
+MAGENTA = (255, 0, 255)
+CYAN = (0, 255, 255)
 VIEW_COLOR = (200, 200, 200, 100)
 
 ROBOT_SIZE = 20
@@ -102,7 +105,8 @@ def save_time_to_file(time_taken, file_path):
 
 robots = [
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), RED),
-    Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), BLUE)
+    Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), BLUE),
+    Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), YELLOW)
 ]
 
 running = True
