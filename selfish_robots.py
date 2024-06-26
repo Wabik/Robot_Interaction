@@ -2,6 +2,9 @@ import pygame
 import random
 import math
 import time
+import pandas as pd
+
+file_path = "j:\Desktop\Robot_Interaction\selfish_time.csv"
 
 pygame.init()
 
@@ -21,6 +24,9 @@ SPEED = 2
 TURN_SPEED = 0.1
 VIEW_DISTANCE = 150
 VIEW_ANGLE = 76
+
+TARGET_SIZE = 100
+target_x, target_y = WIDTH - TARGET_SIZE, 0
 
 class Robot:
     def __init__(self, x, y, color):
@@ -90,13 +96,14 @@ class Robot:
         print("Collision!")
         self.angle += math.pi / 2
 
+def save_time_to_file(time_taken, file_path):
+    df = pd.DataFrame({"selfish time": [time_taken]})
+    df.to_csv(file_path, mode='a', header=False, index=False)
+
 robots = [
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), RED),
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), BLUE)
 ]
-
-TARGET_SIZE = 60 
-target_x, target_y = WIDTH - TARGET_SIZE, 0
 
 running = True
 clock = pygame.time.Clock()
@@ -133,7 +140,9 @@ while running:
 
     if all_robots_on_target:
         end_time = time.time()
+        time_taken = end_time - start_time
         print(f"All robots have found the target in {end_time - start_time:.2f} seconds!")
+        save_time_to_file(time_taken, file_path)
         running = False
 
     pygame.display.flip()
