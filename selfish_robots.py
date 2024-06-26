@@ -81,6 +81,14 @@ class Robot:
                 angle_diff -= 2 * math.pi
             return -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2
         return False
+    
+    def check_collision(self, other):
+        distance = math.hypot(self.x - other.x, self.y - other.y)
+        return distance < ROBOT_SIZE
+
+    def avoid_collision(self, other):
+        print("Collision!")
+        self.angle += math.pi / 2
 
 robots = [
     Robot(random.randint(0, WIDTH), random.randint(0, HEIGHT), RED),
@@ -116,7 +124,13 @@ while running:
         else:
             robot.speed = 0
         robot.draw()
-    
+
+    for i in range(len(robots)):
+        for j in range(i + 1, len(robots)):
+            if robots[i].check_collision(robots[j]):
+                robots[i].avoid_collision(robots[j])
+                robots[j].avoid_collision(robots[i])
+
     if all_robots_on_target:
         end_time = time.time()
         print(f"All robots have found the target in {end_time - start_time:.2f} seconds!")
