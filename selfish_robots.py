@@ -21,7 +21,6 @@ YELLOW = (255, 255, 0)
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 VIEW_COLOR = (200, 200, 200, 100)
-PURPLE = (128, 0, 128)
 
 ROBOT_SIZE = 20
 SPEED = 2
@@ -138,7 +137,7 @@ while running:
     pygame.draw.rect(screen, GREEN, (target_x, target_y, TARGET_SIZE, TARGET_SIZE))
     
     for area in safe_areas:
-        pygame.draw.rect(screen, PURPLE, area)
+        pygame.draw.rect(screen, GREEN, area)
 
     all_robots_in_safe_area = True
     for robot in robots:
