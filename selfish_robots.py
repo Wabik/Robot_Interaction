@@ -118,8 +118,8 @@ def save_time_to_file(time_taken, file_path):
         print(f"Error saving to file: {e}")
 
 robots = [
-    Robot(50, 50, RED),
-    Robot(250, 250, BLUE),
+    Robot(100, 100, RED),
+    Robot(300, 300, BLUE),
     Robot(600, 600, YELLOW)
 ]
 
