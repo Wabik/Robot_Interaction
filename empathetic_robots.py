@@ -73,7 +73,7 @@ class Robot:
     def draw(self):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
         self.draw_visibility_arc()
-        self.draw_distance_to_edges()
+        self.vector_to_edges()
 
     def draw_visibility_arc(self):
         end_angle1 = self.angle - VIEW_ANGLE / 2
@@ -85,14 +85,16 @@ class Robot:
             points.append((dx, dy))
         pygame.draw.polygon(screen, VIEW_COLOR, points, 0)
 
-    def draw_distance_to_edges(self):
+    def vector_to_edges(self):
         distances = self.calculate_distances_to_edges()
         for distance, angle in distances:
             if distance < VIEW_DISTANCE:
                 end_x = self.x + distance * math.cos(angle)
                 end_y = self.y + distance * math.sin(angle)
                 pygame.draw.line(screen, BLUE, (self.x, self.y), (end_x, end_y), 1)
-                print(f"Distance to edge: {distance:.2f}")
+                vector_from_wall = 1 - (distance / 150)
+                # print("Vector", round(vector_from_wall,2 ))
+                # print(f"Distance to edge: {distance:.0f}")
 
     def calculate_distances_to_edges(self):
         distances = []
