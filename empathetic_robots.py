@@ -6,7 +6,6 @@ import pandas as pd
 
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time.csv"
 
-
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
@@ -74,6 +73,7 @@ class Robot:
     def draw(self):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
         self.draw_visibility_arc()
+        self.draw_distance_to_edges()
 
     def draw_visibility_arc(self):
         end_angle1 = self.angle - VIEW_ANGLE / 2
@@ -84,7 +84,42 @@ class Robot:
             dy = self.y + VIEW_DISTANCE * math.sin(angle)
             points.append((dx, dy))
         pygame.draw.polygon(screen, VIEW_COLOR, points, 0)
+
+    def draw_distance_to_edges(self):
+        distances = self.calculate_distances_to_edges()
+        for distance, angle in distances:
+            if distance < VIEW_DISTANCE:
+                end_x = self.x + distance * math.cos(angle)
+                end_y = self.y + distance * math.sin(angle)
+                pygame.draw.line(screen, BLUE, (self.x, self.y), (end_x, end_y), 1)
+                print(f"Distance to edge: {distance:.2f}")
+
+    def calculate_distances_to_edges(self):
+        distances = []
+        for angle_offset in [-VIEW_ANGLE / 2, 0, VIEW_ANGLE / 2]:
+            angle = self.angle + angle_offset
+            angle = angle % (2 * math.pi)
             
+            if 0 <= angle < math.pi / 2:  # Right and Bottom edges
+                distance_to_right = (WIDTH - self.x) / math.cos(angle)
+                distance_to_bottom = (HEIGHT - self.y) / math.sin(angle)
+                distance = min(distance_to_right, distance_to_bottom)
+            elif math.pi / 2 <= angle < math.pi:  # Bottom and Left edges
+                distance_to_bottom = (HEIGHT - self.y) / math.sin(angle)
+                distance_to_left = self.x / math.cos(angle - math.pi)
+                distance = min(distance_to_bottom, distance_to_left)
+            elif math.pi <= angle < 3 * math.pi / 2:  # Left and Top edges
+                distance_to_left = self.x / math.cos(angle - math.pi)
+                distance_to_top = self.y / math.sin(angle - math.pi)
+                distance = min(distance_to_left, distance_to_top)
+            elif 3 * math.pi / 2 <= angle < 2 * math.pi:  # Top and Right edges
+                distance_to_top = self.y / math.sin(angle - math.pi)
+                distance_to_right = (WIDTH - self.x) / math.cos(angle)
+                distance = min(distance_to_top, distance_to_right)
+
+            distances.append((distance, angle))
+        return distances
+
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
         return any(robot_rect.colliderect(area) for area in safe_areas)
@@ -116,7 +151,7 @@ def save_time_to_file(time_taken, file_path):
 
 robots = [
     Robot(100, 100, RED),
-    ]
+]
 
 running = True
 clock = pygame.time.Clock()
