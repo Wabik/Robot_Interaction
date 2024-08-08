@@ -16,7 +16,8 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-GRAY = (169, 169, 169)  # Kolor szary
+GRAY = (169, 169, 169)  
+YELLOW = (255, 255, 0)   
 VIEW_COLOR = (200, 200, 200, 100)
 
 ROBOT_SIZE = 20
@@ -38,7 +39,7 @@ class Robot:
     def __init__(self, x, y, color):
         self.x = x
         self.y = y
-        self.base_color = color  # Bazowy kolor
+        self.base_color = color   
         self.color = self.base_color
         self.angle = random.uniform(0, 2 * math.pi)
         self.speed = SPEED
@@ -58,13 +59,15 @@ class Robot:
             if self.battery_level <= 0:
                 self.speed = 0
                 self.active = False
-                self.color = GRAY  # Kolor szary po rozładowaniu baterii
+                self.color = GRAY 
             else:
                 if self.can_see_target(target_x, target_y, TARGET_SIZE):
                     self.color = GREEN
                     self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                 elif self.can_see_green_robot(robots):
                     self.color = BLUE
+                elif self.can_see_any_robot(robots):
+                    self.color = YELLOW   
                 else:
                     self.color = self.base_color
                     self.rotate_randomly()
@@ -170,6 +173,19 @@ class Robot:
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         return True
         return False
+
+    def can_see_any_robot(self, robots):
+        for other in robots:
+            if other != self:
+                distance = math.hypot(self.x - other.x, self.y - other.y)
+                if distance <= VIEW_DISTANCE:
+                    angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+                    angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+                    if angle_diff > math.pi:
+                        angle_diff -= 2 * math.pi
+                    if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
+                        return True
+        return False
         
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
@@ -187,8 +203,8 @@ def save_time_to_file(time_taken, file_path):
         print(f"Error saving to file: {e}")
 
 robots = [
-    Robot(100, 100, RED),  # Bazowy kolor to czerwony
-    Robot(200, 150, RED),  # Dodajemy więcej robotów
+    Robot(100, 100, RED),
+    Robot(200, 200, RED),
 ]
 
 running = True
@@ -216,7 +232,7 @@ while running:
         else:
             robot.speed = 0
             robot.active = False
-            robot.color = GRAY  # Kolor szary, gdy robot jest w bezpiecznej strefie
+            robot.color = GRAY  
         robot.draw()
 
     for i in range(len(robots)):
