@@ -16,7 +16,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-GRAY = (169, 169, 169)
+GRAY = (169, 169, 169)  # Kolor szary
 VIEW_COLOR = (200, 200, 200, 100)
 
 ROBOT_SIZE = 20
@@ -58,24 +58,25 @@ class Robot:
             if self.battery_level <= 0:
                 self.speed = 0
                 self.active = False
-            
-            if self.can_see_target(target_x, target_y, TARGET_SIZE):
-                self.color = GREEN
-                self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
-            elif self.can_see_green_robot(robots):
-                self.color = BLUE
+                self.color = GRAY  # Kolor szary po rozładowaniu baterii
             else:
-                self.color = self.base_color
-                self.rotate_randomly()
+                if self.can_see_target(target_x, target_y, TARGET_SIZE):
+                    self.color = GREEN
+                    self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
+                elif self.can_see_green_robot(robots):
+                    self.color = BLUE
+                else:
+                    self.color = self.base_color
+                    self.rotate_randomly()
 
-            self.x += self.speed * math.cos(self.angle)
-            self.y += self.speed * math.sin(self.angle)
+                self.x += self.speed * math.cos(self.angle)
+                self.y += self.speed * math.sin(self.angle)
 
-            if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
-                self.angle = (self.angle + math.pi) % (2 * math.pi)
+                if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
+                    self.angle = (self.angle + math.pi) % (2 * math.pi)
 
-            self.x = max(0, min(WIDTH, self.x))
-            self.y = max(0, min(HEIGHT, self.y))
+                self.x = max(0, min(WIDTH, self.x))
+                self.y = max(0, min(HEIGHT, self.y))
 
     def rotate_towards(self, target_x, target_y):
         target_angle = math.atan2(target_y - self.y, target_x - self.x)
@@ -215,6 +216,7 @@ while running:
         else:
             robot.speed = 0
             robot.active = False
+            robot.color = GRAY  # Kolor szary, gdy robot jest w bezpiecznej strefie
         robot.draw()
 
     for i in range(len(robots)):
