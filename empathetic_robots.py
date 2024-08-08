@@ -16,7 +16,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-YELLOW = (255, 255, 0)
+GRAY = (169, 169, 169)
 VIEW_COLOR = (200, 200, 200, 100)
 
 ROBOT_SIZE = 20
@@ -38,7 +38,8 @@ class Robot:
     def __init__(self, x, y, color):
         self.x = x
         self.y = y
-        self.color = color
+        self.base_color = color  # Bazowy kolor
+        self.color = self.base_color
         self.angle = random.uniform(0, 2 * math.pi)
         self.speed = SPEED
         self.active = True
@@ -50,10 +51,6 @@ class Robot:
         if current_time - self.last_battery_update >= 10:
             self.battery_level = max(0, self.battery_level - 0.01)
             self.last_battery_update = current_time
-            vector_from_battery = round(self.battery_level, 2)
-            
-            # print("Bateria", round(self.battery_level,2))
-            # print(f"Battery level of {self.color} robot: {self.battery_level:.2f}")
 
     def move(self):
         if self.active:
@@ -61,6 +58,15 @@ class Robot:
             if self.battery_level <= 0:
                 self.speed = 0
                 self.active = False
+            
+            # Zmiana koloru w zależności od tego, czy robot widzi cel
+            if self.can_see_target(target_x, target_y, TARGET_SIZE):
+                self.color = GREEN
+                self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
+            else:
+                self.color = self.base_color
+                self.rotate_randomly()
+
             self.x += self.speed * math.cos(self.angle)
             self.y += self.speed * math.sin(self.angle)
 
@@ -135,9 +141,6 @@ class Robot:
                 end_x = self.x + distance * math.cos(angle)
                 end_y = self.y + distance * math.sin(angle)
                 pygame.draw.line(screen, BLUE, (self.x, self.y), (end_x, end_y), 1)
-                vector_from_wall = 1 - (distance / 150)
-                # print("Vector", round(vector_from_wall,2 ))
-                # print(f"Distance to edge: {distance:.0f}")
 
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
@@ -169,7 +172,7 @@ def save_time_to_file(time_taken, file_path):
         print(f"Error saving to file: {e}")
 
 robots = [
-    Robot(100, 100, RED),
+    Robot(100, 100, GRAY),
 ]
 
 running = True
@@ -192,10 +195,6 @@ while running:
     all_robots_in_safe_area = True
     for robot in robots:
         if not robot.is_in_safe_area():
-            if robot.can_see_target(target_x, target_y, TARGET_SIZE):
-                 robot.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
-            else:
-                robot.rotate_randomly()
             robot.move()
             all_robots_in_safe_area = False
         else:
