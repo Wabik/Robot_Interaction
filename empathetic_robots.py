@@ -16,8 +16,8 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-GRAY = (169, 169, 169)  
-YELLOW = (255, 255, 0)   
+GRAY = (169, 169, 169) 
+YELLOW = (255, 255, 0)
 VIEW_COLOR = (200, 200, 200, 100)
 
 ROBOT_SIZE = 20
@@ -39,7 +39,7 @@ class Robot:
     def __init__(self, x, y, color):
         self.x = x
         self.y = y
-        self.base_color = color   
+        self.base_color = color
         self.color = self.base_color
         self.angle = random.uniform(0, 2 * math.pi)
         self.speed = SPEED
@@ -52,6 +52,8 @@ class Robot:
         if current_time - self.last_battery_update >= 10:
             self.battery_level = max(0, self.battery_level - 0.01)
             self.last_battery_update = current_time
+            print(f"Battery level of {self.color} robot: {self.battery_level:.2f}")
+            vector_battery = round(self.battery_level, 2)
 
     def move(self, robots):
         if self.active:
@@ -59,7 +61,7 @@ class Robot:
             if self.battery_level <= 0:
                 self.speed = 0
                 self.active = False
-                self.color = GRAY 
+                self.color = GRAY
             else:
                 if self.can_see_target(target_x, target_y, TARGET_SIZE):
                     self.color = GREEN
@@ -67,7 +69,7 @@ class Robot:
                 elif self.can_see_green_robot(robots):
                     self.color = BLUE
                 elif self.can_see_any_robot(robots):
-                    self.color = YELLOW   
+                    self.color = YELLOW
                 else:
                     self.color = self.base_color
                     self.rotate_randomly()
@@ -102,6 +104,7 @@ class Robot:
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
         self.draw_visibility_arc()
         self.vector_to_edges()
+        self.vector_to_target()
 
     def draw_visibility_arc(self):
         end_angle1 = self.angle - VIEW_ANGLE / 2
@@ -146,6 +149,20 @@ class Robot:
                 end_x = self.x + distance * math.cos(angle)
                 end_y = self.y + distance * math.sin(angle)
                 pygame.draw.line(screen, BLUE, (self.x, self.y), (end_x, end_y), 1)
+                vector_from_wall = 1 - (distance / 150)
+                # print("Vector", round(vector_from_wall,2 ))
+                # print(f"Distance to edge: {distance:.0f}")
+
+    def calculate_distance_to_target(self):
+
+        distance = math.sqrt((self.x - target_x) ** 2 + (self.y - target_y) ** 2)
+        return distance
+
+    def vector_to_target(self):
+        distance = self.calculate_distance_to_target()
+        if distance < VIEW_DISTANCE:
+            vector_to_target = 1 - (distance / VIEW_DISTANCE)
+            print("Vector to target:", round(vector_to_target, 2))
 
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
@@ -186,7 +203,26 @@ class Robot:
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         return True
         return False
+
+    def count_visible_robots(self, robots):
+        total_robots = len(robots) - 1
+        if total_robots <= 0:
+            return 0
         
+        visible_count = 0
+        for other in robots:
+            if other != self:
+                distance = math.hypot(self.x - other.x, self.y - other.y)
+                if distance <= VIEW_DISTANCE:
+                    angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+                    angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+                    if angle_diff > math.pi:
+                        angle_diff -= 2 * math.pi
+                    if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
+                        visible_count += 1
+        
+        return visible_count / total_robots
+
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
         return distance < ROBOT_SIZE
@@ -204,7 +240,8 @@ def save_time_to_file(time_taken, file_path):
 
 robots = [
     Robot(100, 100, RED),
-    Robot(200, 200, RED),
+    Robot(300, 300, RED),
+    Robot(600, 600, RED),
 ]
 
 running = True
@@ -232,8 +269,11 @@ while running:
         else:
             robot.speed = 0
             robot.active = False
-            robot.color = GRAY  
+            robot.color = GRAY
         robot.draw()
+        
+        visibility_ratio = robot.count_visible_robots(robots)
+
 
     for i in range(len(robots)):
         for j in range(i + 1, len(robots)):
