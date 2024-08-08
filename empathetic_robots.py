@@ -52,17 +52,18 @@ class Robot:
             self.battery_level = max(0, self.battery_level - 0.01)
             self.last_battery_update = current_time
 
-    def move(self):
+    def move(self, robots):
         if self.active:
             self.battery()
             if self.battery_level <= 0:
                 self.speed = 0
                 self.active = False
             
-            # Zmiana koloru w zależności od tego, czy robot widzi cel
             if self.can_see_target(target_x, target_y, TARGET_SIZE):
                 self.color = GREEN
                 self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
+            elif self.can_see_green_robot(robots):
+                self.color = BLUE
             else:
                 self.color = self.base_color
                 self.rotate_randomly()
@@ -145,7 +146,7 @@ class Robot:
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
         return any(robot_rect.colliderect(area) for area in safe_areas)
-        
+
     def can_see_target(self, target_x, target_y, target_size):
         distance = math.hypot(self.x - (target_x + target_size / 2), self.y - (target_y + target_size / 2))
         if distance <= VIEW_DISTANCE:
@@ -154,6 +155,19 @@ class Robot:
             if angle_diff > math.pi:
                 angle_diff -= 2 * math.pi
             return -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2
+        return False
+
+    def can_see_green_robot(self, robots):
+        for other in robots:
+            if other != self and other.color == GREEN:
+                distance = math.hypot(self.x - other.x, self.y - other.y)
+                if distance <= VIEW_DISTANCE:
+                    angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+                    angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+                    if angle_diff > math.pi:
+                        angle_diff -= 2 * math.pi
+                    if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
+                        return True
         return False
         
     def check_collision(self, other):
@@ -172,7 +186,8 @@ def save_time_to_file(time_taken, file_path):
         print(f"Error saving to file: {e}")
 
 robots = [
-    Robot(100, 100, GRAY),
+    Robot(100, 100, RED),  # Bazowy kolor to czerwony
+    Robot(200, 150, RED),  # Dodajemy więcej robotów
 ]
 
 running = True
@@ -195,7 +210,7 @@ while running:
     all_robots_in_safe_area = True
     for robot in robots:
         if not robot.is_in_safe_area():
-            robot.move()
+            robot.move(robots)
             all_robots_in_safe_area = False
         else:
             robot.speed = 0
