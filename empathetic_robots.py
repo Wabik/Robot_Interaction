@@ -227,7 +227,7 @@ class Robot:
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         visible_count += 1
         vector_see_robots = round(visible_count / total_robots,2)
-
+        # print(vector_see_robots)
         return vector_see_robots
 
     def check_collision(self, other):
@@ -237,6 +237,13 @@ class Robot:
     def avoid_collision(self, other):
         print("Collision!")
         self.angle = (self.angle + math.pi / 2) % (2 * math.pi)
+
+def vector_green_robot_vision(robot, robots):
+
+    if robot.can_see_green_robot(robots):
+        return 1
+    else:
+        return 0
 
 def save_time_to_file(time_taken, file_path):
     try:
@@ -281,6 +288,9 @@ while running:
         
         visibility_ratio = robot.count_visible_robots(robots)
 
+        sees_green = vector_green_robot_vision(robot, robots)
+        print(f"Robot at ({robot.x}, {robot.y}) sees a green robot: {sees_green}")
+        
 
     for i in range(len(robots)):
         for j in range(i + 1, len(robots)):
