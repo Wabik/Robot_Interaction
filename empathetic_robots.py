@@ -197,6 +197,19 @@ class Robot:
                         return True
         return False
 
+    def can_see_blue_robot(self, robots):
+        for other in robots:
+            if other != self and other.color == BLUE:
+                distance = math.hypot(self.x - other.x, self.y - other.y)
+                if distance <= VIEW_DISTANCE:
+                    angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+                    angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+                    if angle_diff > math.pi:
+                        angle_diff -= 2 * math.pi
+                    if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
+                        return True
+        return False
+
     def can_see_any_robot(self, robots):
         for other in robots:
             if other != self:
@@ -227,7 +240,7 @@ class Robot:
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         visible_count += 1
         vector_see_robots = round(visible_count / total_robots,2)
-        # print(vector_see_robots)
+        print(vector_see_robots)
         return vector_see_robots
 
     def check_collision(self, other):
@@ -239,8 +252,13 @@ class Robot:
         self.angle = (self.angle + math.pi / 2) % (2 * math.pi)
 
 def vector_green_robot_vision(robot, robots):
-
     if robot.can_see_green_robot(robots):
+        return 1
+    else:
+        return 0
+
+def vector_blue_robot_vision(robot, robots):
+    if robot.can_see_blue_robot(robots):
         return 1
     else:
         return 0
@@ -289,8 +307,11 @@ while running:
         visibility_ratio = robot.count_visible_robots(robots)
 
         sees_green = vector_green_robot_vision(robot, robots)
-        print(f"Robot at ({robot.x}, {robot.y}) sees a green robot: {sees_green}")
+        # print(f"Robot at ({robot.x}, {robot.y}) sees a green robot: {sees_green}")
         
+        sees_blue = vector_blue_robot_vision(robot, robots)
+        print(sees_blue)
+        # print(f"Robot at ({robot.x}, {robot.y}) sees a blue robot: {sees_blue}")
 
     for i in range(len(robots)):
         for j in range(i + 1, len(robots)):
