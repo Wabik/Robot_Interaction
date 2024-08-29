@@ -68,8 +68,6 @@ class Robot:
                     self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                 elif self.can_see_green_robot(robots):
                     self.color = BLUE
-                elif self.can_see_any_robot(robots):
-                    self.color = YELLOW
                 else:
                     self.color = self.base_color
                     self.rotate_randomly()
@@ -154,15 +152,25 @@ class Robot:
                 # print(f"Distance to edge: {distance:.0f}")
 
     def calculate_distance_to_target(self):
+        nearest_x = max(target_x + 5, min(self.x, target_x + TARGET_SIZE - 5))
+        nearest_y = max(target_y + 5, min(self.y, target_y + TARGET_SIZE - 5))
 
-        distance = math.sqrt((self.x - target_x) ** 2 + (self.y - target_y) ** 2)
+        distance = math.sqrt((self.x - nearest_x) ** 2 + (self.y - nearest_y) ** 2)
         return distance
+
 
     def vector_to_target(self):
         distance = self.calculate_distance_to_target()
+        if self.is_in_safe_area():
+            return None
+
         if distance < VIEW_DISTANCE:
             vector_to_target = 1 - (distance / VIEW_DISTANCE)
-            print("Vector to target:", round(vector_to_target, 2))
+        else:
+            vector_to_target = 0  # Target is out of the visibility range
+
+        print("Vector to target:", round(vector_to_target, 2))
+        return vector_to_target
 
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
