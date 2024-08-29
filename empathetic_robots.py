@@ -158,7 +158,6 @@ class Robot:
         distance = math.sqrt((self.x - nearest_x) ** 2 + (self.y - nearest_y) ** 2)
         return distance
 
-
     def vector_to_target(self):
         distance = self.calculate_distance_to_target()
         if self.is_in_safe_area():
@@ -168,8 +167,7 @@ class Robot:
             vector_to_target = 1 - (distance / VIEW_DISTANCE)
         else:
             vector_to_target = 0  # Target is out of the visibility range
-
-        print("Vector to target:", round(vector_to_target, 2))
+        # print("Vector to target:", round(vector_to_target, 2))
         return vector_to_target
 
     def is_in_safe_area(self):
@@ -228,8 +226,9 @@ class Robot:
                         angle_diff -= 2 * math.pi
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         visible_count += 1
-        
-        return visible_count / total_robots
+        vector_see_robots = round(visible_count / total_robots,2)
+
+        return vector_see_robots
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
