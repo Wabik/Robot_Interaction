@@ -242,6 +242,37 @@ class Robot:
         vector_see_robots = round(visible_count / total_robots,2)
         print(vector_see_robots)
         return vector_see_robots
+    
+
+    def find_nearest_robot_of_color(self, robots, color):
+        min_distance = VIEW_DISTANCE  # Only consider distances within view distance
+        nearest_robot = None
+        for other in robots:
+            if other != self and other.color == color:
+                distance = math.hypot(self.x - other.x, self.y - other.y)
+                if distance <= VIEW_DISTANCE:
+                    angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+                    angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+                    if angle_diff > math.pi:
+                        angle_diff -= 2 * math.pi
+                    if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2 and distance < min_distance:
+                        min_distance = distance
+                        nearest_robot = other
+        return nearest_robot, min_distance
+
+    def vector_blue_robot(self, robots):
+        nearest_blue_robot, distance = self.find_nearest_robot_of_color(robots, BLUE)
+        if nearest_blue_robot:
+            return 1 - (distance / VIEW_DISTANCE)
+        return 0   
+    def vector_green_robot(self, robots):
+        nearest_green_robot, distance = self.find_nearest_robot_of_color(robots, GREEN)
+        if nearest_green_robot:
+            print("Zielony", 1 - (distance / VIEW_DISTANCE))
+            return 1 - (distance / VIEW_DISTANCE)
+        print("Green", 0)
+        return 0  # 
+
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
@@ -305,12 +336,14 @@ while running:
         robot.draw()
         
         visibility_ratio = robot.count_visible_robots(robots)
+        blue_ratio = robot.vector_blue_robot(robots)
+        green_ratio = robot.vector_green_robot(robots)
 
-        sees_green = vector_green_robot_vision(robot, robots)
+        # sees_green = vector_green_robot_vision(robot, robots)
         # print(f"Robot at ({robot.x}, {robot.y}) sees a green robot: {sees_green}")
         
-        sees_blue = vector_blue_robot_vision(robot, robots)
-        print(sees_blue)
+        # sees_blue = vector_blue_robot_vision(robot, robots)
+        # print(sees_blue)
         # print(f"Robot at ({robot.x}, {robot.y}) sees a blue robot: {sees_blue}")
 
     for i in range(len(robots)):
