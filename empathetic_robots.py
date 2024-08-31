@@ -62,7 +62,17 @@ class Robot:
         self.speed = SPEED
         self.active = True
         self.battery_level = BATTERY
-        self.knowledge = []
+        self.knowledge = [[0.9,0.7,0.5,0,0,0], 
+                          [0.5,0,0,0,0,0], 
+                          [0.6,0.9,0.1,0,0,0], 
+                          [0.8,0.2,0,0.5,0.3,0], 
+                          [0.9,0.8,0.8,0,0,0], 
+                          [0.1,0,0,0,0,0], 
+                          [0.3,0,0,0.5,0.9,0],
+                          [0.7,0.5,0.5,1,0.6,0.3]]
+        self.rewards =[0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
+        self.current_stage = 0
+        self.current_reward = 0
         self.last_battery_update = time.time()
 
     def battery(self):
@@ -261,7 +271,7 @@ class Robot:
                     if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                         visible_count += 1
         vector_see_robots = round(visible_count / total_robots,2)
-        print(vector_see_robots)
+        # print(vector_see_robots)
         return vector_see_robots
     
     def find_nearest_robot_of_color(self, robots, color):
@@ -288,23 +298,32 @@ class Robot:
     def vector_green_robot(self, robots):
         nearest_green_robot, distance = self.find_nearest_robot_of_color(robots, GREEN)
         if nearest_green_robot:
-            print("Zielony", 1 - (distance / VIEW_DISTANCE))
             return 1 - (distance / VIEW_DISTANCE)
-        print("Green", 0)
         return 0  # 
 
 
-    def update_knowledge(self, robots):
+    def current_knowledge(self, robots):
         current_vectors = {
             'battery': self.battery_level,
             'to_edge': self.vector_to_edges(),
             'to_target': self.vector_to_target(),
             'count_robots': self.count_visible_robots(robots),
-            'to_blue_robot': self.vector_blue_robot(robots),
             'to_green_robot': self.vector_green_robot(robots),
+            'to_blue_robot': self.vector_blue_robot(robots)
         }
-        print("Wiedza",current_vectors)
-        self.knowledge.append(list(current_vectors.values()))
+        print("Wiedza", current_vectors)
+        self.current_stage = list(current_vectors.values())
+        print("Obecny stan", self.current_stage)
+        reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
+        self.current_reward = reward
+        print("Obecna nagroda", round(self.current_reward,2))
+
+    # def current_rewards(self,robots):
+    #     reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
+    #     self.current_reward = reward
+    #     print("Obecna nagroda", self.current_reward)
+   
+
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
@@ -361,7 +380,8 @@ while running:
         
         if not robot.is_in_safe_area():
             robot.move(robots)
-            robot.update_knowledge(robots)
+            robot.current_knowledge(robots)
+            # robot.current_reward()
 
             all_robots_in_safe_area = False
         else:
