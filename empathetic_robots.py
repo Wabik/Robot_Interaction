@@ -149,8 +149,11 @@ class Robot:
                 end_y = self.y + distance * math.sin(angle)
                 pygame.draw.line(screen, BLUE, (self.x, self.y), (end_x, end_y), 1)
                 vector_from_wall = 1 - (distance / 150)
+                return round(vector_from_wall, 2)
                 # print("Vector", round(vector_from_wall,2 ))
                 # print(f"Distance to edge: {distance:.0f}")
+            else: 
+                return 0
 
     def calculate_distance_to_target(self):
         nearest_x = max(target_x + 5, min(self.x, target_x + TARGET_SIZE - 5))
@@ -161,15 +164,15 @@ class Robot:
 
     def vector_to_target(self):
         distance = self.calculate_distance_to_target()
-        if self.is_in_safe_area():
-            return None
+        # if self.is_in_safe_area():
+        #     return None
 
         if distance < VIEW_DISTANCE:
             vector_to_target = 1 - (distance / VIEW_DISTANCE)
         else:
             vector_to_target = 0  # Target is out of the visibility range
         # print("Vector to target:", round(vector_to_target, 2))
-        return vector_to_target
+        return round(vector_to_target, 2)
 
     def is_in_safe_area(self):
         robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
@@ -279,11 +282,12 @@ class Robot:
             'battery': self.battery_level,
             'to_edge': self.vector_to_edges(),
             'to_target': self.vector_to_target(),
-            'count_robots': self.count_visible_robots(),
+            'count_robots': self.count_visible_robots(robots),
             'to_blue_robot': self.vector_blue_robot(robots),
             'to_green_robot': self.vector_green_robot(robots),
         }
-        self.knowledge.append(current_vectors)
+        print("Wiedza",current_vectors)
+        # self.knowledge.append(list(current_vectors.values()))
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
@@ -337,8 +341,11 @@ while running:
 
     all_robots_in_safe_area = True
     for robot in robots:
+        
         if not robot.is_in_safe_area():
             robot.move(robots)
+            robot.update_knowledge(robots)
+
             all_robots_in_safe_area = False
         else:
             robot.speed = 0
