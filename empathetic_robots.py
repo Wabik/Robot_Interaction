@@ -45,6 +45,7 @@ class Robot:
         self.speed = SPEED
         self.active = True
         self.battery_level = BATTERY
+        self.knowledge = []
         self.last_battery_update = time.time()
 
     def battery(self):
@@ -243,7 +244,6 @@ class Robot:
         print(vector_see_robots)
         return vector_see_robots
     
-
     def find_nearest_robot_of_color(self, robots, color):
         min_distance = VIEW_DISTANCE  # Only consider distances within view distance
         nearest_robot = None
@@ -273,6 +273,17 @@ class Robot:
         print("Green", 0)
         return 0  # 
 
+
+    def update_knowledge(self, robots):
+        current_vectors = {
+            'battery': self.battery_level,
+            'to_edge': self.vector_to_edges(),
+            'to_target': self.vector_to_target(),
+            'count_robots': self.count_visible_robots(),
+            'to_blue_robot': self.vector_blue_robot(robots),
+            'to_green_robot': self.vector_green_robot(robots),
+        }
+        self.knowledge.append(current_vectors)
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
