@@ -3,6 +3,7 @@ import random
 import math
 import time
 import pandas as pd
+import numpy as np
 
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time.csv"
 
@@ -34,6 +35,22 @@ safe_areas = [
     pygame.Rect(target_x, 0, WIDTH - target_x, 5),
     pygame.Rect(795, 0, 5, 100)
 ]
+
+# Wzór 2.1 - funkcja obliczająca podobieństwo między dwoma zbiorami rozmytymi
+def similarity(Aj, Ai):
+    n = len(Aj)
+    distance = np.sqrt(np.sum((np.array(Aj) - np.array(Ai))**2) / n)
+    return 1 - distance
+
+# Wzór 2.2 - funkcja obliczająca ocenę stanu na podstawie podobieństwa do innych stanów
+def calculate_reward(Ai, A_list, r_list):
+    m = len(A_list)
+    weighted_sum = 0
+    for j in range(m):
+        s_ij = similarity(A_list[j], Ai)
+        weighted_sum += s_ij * r_list[j]
+    return weighted_sum / m
+
 
 class Robot:
     def __init__(self, x, y, color):
@@ -385,7 +402,6 @@ while running:
 #     for index, robot in enumerate(robots):
 #         knowledge_count = len(robot.knowledge)
 #         print(f"Robot {index + 1}): {knowledge_count} knowledge points")
-
 
 pygame.quit()
 # print_knowledge_summary(robots)
