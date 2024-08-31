@@ -287,7 +287,7 @@ class Robot:
             'to_green_robot': self.vector_green_robot(robots),
         }
         print("Wiedza",current_vectors)
-        # self.knowledge.append(list(current_vectors.values()))
+        self.knowledge.append(list(current_vectors.values()))
 
     def check_collision(self, other):
         distance = math.hypot(self.x - other.x, self.y - other.y)
@@ -380,4 +380,12 @@ while running:
     pygame.display.flip()
     clock.tick(60)
 
+def print_knowledge_summary(robots):
+    print("Knowledge Summary for Each Robot:")
+    for index, robot in enumerate(robots):
+        knowledge_count = len(robot.knowledge)  # Get the count of knowledge entries
+        print(f"Robot {index + 1} ({robot.color}): {knowledge_count} knowledge points")
+
+
 pygame.quit()
+print_knowledge_summary(robots)
