@@ -27,6 +27,15 @@ BATTERY = 1.0
 TURN_SPEED = 0.1
 VIEW_DISTANCE = 150
 VIEW_ANGLE = math.radians(76)
+KNOWLEDGE = [[0.9,0.7,0.5,0,0,0], 
+                          [0.5,0,0,0,0,0], 
+                          [0.6,0.9,0.1,0,0,0], 
+                          [0.8,0.2,0,0.5,0.3,0], 
+                          [0.9,0.8,0.8,0,0,0], 
+                          [0.1,0,0,0,0,0], 
+                          [0.3,0,0,0.5,0.9,0],
+                          [0.7,0.5,0.5,1,0.6,0.3]]
+REWARDS = [0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
 
 TARGET_SIZE = 100
 target_x, target_y = WIDTH - TARGET_SIZE, 0
@@ -61,15 +70,8 @@ class Robot:
         self.speed = SPEED
         self.active = True
         self.battery_level = BATTERY
-        self.knowledge = [[0.9,0.7,0.5,0,0,0], 
-                          [0.5,0,0,0,0,0], 
-                          [0.6,0.9,0.1,0,0,0], 
-                          [0.8,0.2,0,0.5,0.3,0], 
-                          [0.9,0.8,0.8,0,0,0], 
-                          [0.1,0,0,0,0,0], 
-                          [0.3,0,0,0.5,0.9,0],
-                          [0.7,0.5,0.5,1,0.6,0.3]]
-        self.rewards =[0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
+        self.knowledge = KNOWLEDGE
+        self.rewards = REWARDS
         self.current_stage = 0
         self.current_reward = 0
         self.see_target = False
