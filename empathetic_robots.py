@@ -161,11 +161,19 @@ class Robot:
         end_angle1 = self.angle - VIEW_ANGLE / 2
         end_angle2 = self.angle + VIEW_ANGLE / 2
         points = [(self.x, self.y)]
-        for angle in [end_angle1, end_angle2]:
+        
+        num_points = 20
+        for i in range(num_points + 1):
+            angle = end_angle1 + i * (end_angle2 - end_angle1) / num_points
             dx = self.x + VIEW_DISTANCE * math.cos(angle)
             dy = self.y + VIEW_DISTANCE * math.sin(angle)
             points.append((dx, dy))
-        pygame.draw.polygon(screen, VIEW_COLOR, points, 0)
+        
+        s = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        pygame.draw.polygon(s, (0, 0, 0, 50), points)
+        screen.blit(s, (0, 0))
+
+        pygame.draw.polygon(screen, (0, 0, 0), points, 1)  #1 definiuje gruboiść obramowania
 
     def calculate_distances_to_edges(self):
         distances = []
