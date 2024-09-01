@@ -51,7 +51,6 @@ def calculate_reward(Ai, A_list, r_list):
         weighted_sum += s_ij * r_list[j]
     return weighted_sum / m
 
-
 class Robot:
     def __init__(self, x, y, color):
         self.x = x
@@ -73,6 +72,7 @@ class Robot:
         self.rewards =[0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
         self.current_stage = 0
         self.current_reward = 0
+        self.see_target = False
         self.last_battery_update = time.time()
 
     def battery(self):
@@ -91,13 +91,19 @@ class Robot:
                 self.active = False
                 self.color = GRAY
             else:
+                target_robot = self.find_robot_to_follow(robots)
+
                 if self.can_see_target(target_x, target_y, TARGET_SIZE):
                     self.color = GREEN
+                    self.see_target = True
                     self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
-                elif self.can_see_green_robot(robots):
+                elif target_robot:
                     self.color = BLUE
+                    self.see_target = False
+                    self.rotate_towards(target_robot.x, target_robot.y)
                 else:
                     self.color = self.base_color
+                    self.see_target = False
                     self.rotate_randomly()
 
                 self.x += self.speed * math.cos(self.angle)
@@ -108,6 +114,25 @@ class Robot:
 
                 self.x = max(0, min(WIDTH, self.x))
                 self.y = max(0, min(HEIGHT, self.y))
+
+    def find_robot_to_follow(self, robots):
+        for other in robots:
+            if other != self and self.can_see_robot(other):
+                if other.color == GREEN or (other.see_target and self.current_reward < other.current_reward ):
+                    return other
+        return None
+
+    def can_see_robot(self, other):
+        distance = math.hypot(self.x - other.x, self.y - other.y)
+        if distance <= VIEW_DISTANCE:
+            angle_to_other = math.atan2(other.y - self.y, other.x - self.x)
+            angle_diff = (angle_to_other - self.angle) % (2 * math.pi)
+            if angle_diff > math.pi:
+                angle_diff -= 2 * math.pi
+            if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
+                return True
+            print("Widzę!")
+        return False
 
     def rotate_towards(self, target_x, target_y):
         target_angle = math.atan2(target_y - self.y, target_x - self.x)
