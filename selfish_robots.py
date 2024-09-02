@@ -9,7 +9,7 @@ FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time.csv"
 def run_simulation():
     pygame.init()
 
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 400,400
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Robot Simulation")
 
@@ -31,7 +31,7 @@ def run_simulation():
 
     safe_areas = [
         pygame.Rect(target_x, 0, WIDTH - target_x, 5),
-        pygame.Rect(795, 0, 5, 100)
+        pygame.Rect(WIDTH-5, 0, 5, 100)
     ]
 
     class Robot:
@@ -116,8 +116,8 @@ def run_simulation():
 
     robots = [
         Robot(100, 100, RED),
-        Robot(300, 300, BLUE),
-        Robot(600, 600, YELLOW)
+        Robot(200, 200, BLUE),
+        Robot(300, 300, YELLOW)
     ]
 
     running = True
@@ -172,4 +172,4 @@ def run_simulation():
 for i in range(10):
     print("Proba", i)
     run_simulation()
-    pygame.time.wait(50)  
+    pygame.time.wait(10)  
