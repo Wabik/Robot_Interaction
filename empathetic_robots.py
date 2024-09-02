@@ -9,7 +9,7 @@ FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time.csv"
 
 pygame.init()
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 400, 400
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Robot Simulation")
 
@@ -25,7 +25,7 @@ ROBOT_SIZE = 20
 SPEED = 2
 BATTERY = 1.0
 TURN_SPEED = 0.1
-VIEW_DISTANCE = 150
+VIEW_DISTANCE = 200
 VIEW_ANGLE = math.radians(76)
 KNOWLEDGE = [[0.9,0.7,0.5,0,0,0], 
                           [0.5,0,0,0,0,0], 
@@ -42,7 +42,7 @@ target_x, target_y = WIDTH - TARGET_SIZE, 0
 
 safe_areas = [
     pygame.Rect(target_x, 0, WIDTH - target_x, 5),
-    pygame.Rect(795, 0, 5, 100)
+    pygame.Rect(WIDTH-5, 0, 5, 100)
 ]
 
 # Wzór 2.1 - funkcja obliczająca podobieństwo między dwoma zbiorami rozmytymi
@@ -389,8 +389,8 @@ def save_time_to_file(time_taken, file_path):
 
 robots = [
     Robot(100, 100, RED),
+    Robot(200, 200, RED),
     Robot(300, 300, RED),
-    Robot(600, 600, RED),
 ]
 
 running = True
@@ -408,7 +408,7 @@ while running:
     pygame.draw.rect(screen, GREEN, (target_x, target_y, TARGET_SIZE, TARGET_SIZE))
         
     for area in safe_areas:
-        pygame.draw.rect(screen, GREEN, area)
+        pygame.draw.rect(screen, RED, area)
 
     all_robots_in_safe_area = True
     for robot in robots:
