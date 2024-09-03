@@ -63,7 +63,7 @@ def run_simulation():
         return weighted_sum / m
 
     class Robot:
-        def __init__(self, x, y, color):
+        def __init__(self, x, y, color, identifier):
             self.x = x
             self.y = y
             self.base_color = color
@@ -78,6 +78,8 @@ def run_simulation():
             self.current_reward = 0
             self.see_target = False
             self.last_battery_update = time.time()
+            self.identifier = identifier
+            self.entry_time = None
 
         def battery(self):
             current_time = time.time()
@@ -135,7 +137,7 @@ def run_simulation():
                     angle_diff -= 2 * math.pi
                 if -VIEW_ANGLE / 2 <= angle_diff <= VIEW_ANGLE / 2:
                     return True
-                print("Widzę!")
+                # print("Widzę!")
             return False
 
         def rotate_towards(self, target_x, target_y):
@@ -348,12 +350,12 @@ def run_simulation():
                 'to_green_robot': self.vector_green_robot(robots),
                 'to_blue_robot': self.vector_blue_robot(robots)
             }
-            print("Wiedza", current_vectors)
+            # print("Wiedza", current_vectors)
             self.current_stage = list(current_vectors.values())
-            print("Obecny stan", self.current_stage)
+            # print("Obecny stan", self.current_stage)
             reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
             self.current_reward = reward
-            print("Obecna nagroda", round(self.current_reward,2))
+            # print("Obecna nagroda", round(self.current_reward,2))
 
         # def current_rewards(self,robots):
         #     reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
@@ -390,9 +392,9 @@ def run_simulation():
             print(f"Error saving to file: {e}")
 
     robots = [
-        Robot(100, 100, RED),
-        Robot(200, 200, RED),
-        Robot(300, 300, RED),
+        Robot(100, 100, RED, 'A'),
+        Robot(200, 200, RED, 'B'),
+        Robot(300, 300, RED, 'C'),
     ]
 
     running = True
@@ -410,7 +412,7 @@ def run_simulation():
         pygame.draw.rect(screen, GREEN, (target_x, target_y, TARGET_SIZE, TARGET_SIZE))
             
         for area in safe_areas:
-            pygame.draw.rect(screen, RED, area)
+            pygame.draw.rect(screen, GREEN, area)
 
         all_robots_in_safe_area = True
         for robot in robots:
@@ -465,7 +467,7 @@ def run_simulation():
 
 
 
-for i in range(10):
+for i in range(1):
     print("Proba", i)
     run_simulation()
     pygame.time.wait(10)  
