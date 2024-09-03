@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import os
 import time
 import pandas as pd
 import numpy as np
@@ -459,7 +460,7 @@ def run_simulation():
             end_time = time.time()
             time_taken = end_time - start_time
             print(f"All robots have found the target in {time_taken:.2f} seconds!")
-            save_time_to_file(time_taken, FILE_PATH)
+            # save_time_to_file(time_taken, FILE_PATH)
             running = False
             sorted_entry_times = sorted(entry_times.items(), key=lambda x: x[1])
             first_robot = sorted_entry_times[0][0]
@@ -483,6 +484,13 @@ def run_simulation():
 
             print(df)
 
+            if os.path.isfile(FILE_PATH):
+                column_names = False
+            else:
+                column_names = True
+
+            df.to_csv(FILE_PATH, mode='a', header=column_names, index=False)
+
         pygame.display.flip()
         clock.tick(60)
 
@@ -495,9 +503,7 @@ def run_simulation():
     pygame.quit()
     # print_knowledge_summary(robots)
 
-
-
-for i in range(1):
+for i in range(2):
     print("Proba", i)
     run_simulation()
     pygame.time.wait(10)  
