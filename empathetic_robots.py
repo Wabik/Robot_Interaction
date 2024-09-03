@@ -461,6 +461,27 @@ def run_simulation():
             print(f"All robots have found the target in {time_taken:.2f} seconds!")
             save_time_to_file(time_taken, FILE_PATH)
             running = False
+            sorted_entry_times = sorted(entry_times.items(), key=lambda x: x[1])
+            first_robot = sorted_entry_times[0][0]
+            second_robot = sorted_entry_times[1][0]
+            third_robot = sorted_entry_times[2][0]
+
+            data = {
+                'Czas symulacji': [round(time_taken, 2)],
+                'Poziom baterii A': [robots[0].battery_level],
+                'Poziom baterii B': [robots[1].battery_level],
+                'Poziom baterii C': [robots[2].battery_level],
+                'Czas robota A': [entry_times.get('A', None)],
+                'Czas robota B': [entry_times.get('B', None)],
+                'Czas robota C': [entry_times.get('C', None)],
+                'Pierwszy robot': [first_robot],
+                'Drugi robot': [second_robot],
+                'Trzeci robot': [third_robot]
+            }
+
+            df = pd.DataFrame(data)
+
+            print(df)
 
         pygame.display.flip()
         clock.tick(60)
