@@ -79,7 +79,7 @@ def run_simulation():
             self.see_target = False
             self.last_battery_update = time.time()
             self.identifier = identifier
-            self.entry_time = None
+            self.finish_time = None
 
         def battery(self):
             current_time = time.time()
@@ -397,6 +397,8 @@ def run_simulation():
         Robot(300, 300, RED, 'C'),
     ]
 
+    entry_times = {}
+
     running = True
     clock = pygame.time.Clock()
 
@@ -423,10 +425,17 @@ def run_simulation():
                 # robot.current_reward()
 
                 all_robots_in_safe_area = False
-            else:
+
+            else:               
                 robot.speed = 0
                 robot.active = False
                 robot.color = GRAY
+
+                if robot.finish_time is None:
+                        robot.finish_time = round(time.time() - start_time,2)
+                        entry_times[robot.identifier] = robot.finish_time
+                        print(entry_times)
+
             robot.draw()
             
             visibility_ratio = robot.count_visible_robots(robots)
