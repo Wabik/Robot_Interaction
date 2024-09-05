@@ -22,6 +22,7 @@ def run_simulation():
 
     ROBOT_SIZE = 20
     SPEED = 2
+    BATTERY = 1.0
     TURN_SPEED = 0.1
     VIEW_DISTANCE = 150
     VIEW_ANGLE = math.radians(76)
@@ -42,18 +43,34 @@ def run_simulation():
             self.angle = random.uniform(0, 2 * math.pi)
             self.speed = SPEED
             self.active = True
+            self.battery_level = BATTERY
             self.identifier = identifier
+            self.last_battery_update = time.time()
+
+        def battery(self):
+            current_time = time.time()
+            if current_time - self.last_battery_update >= 10:
+                self.battery_level = max(0, self.battery_level - 0.01)
+                self.last_battery_update = current_time
+                print(f"Battery level of {self.color} robot: {self.battery_level:.2f}")
+                vector_battery = round(self.battery_level, 2)
 
         def move(self):
             if self.active:
-                self.x += self.speed * math.cos(self.angle)
-                self.y += self.speed * math.sin(self.angle)
+                self.battery()
+                if self.battery_level <= 0:
+                    self.speed = 0
+                    self.active = False
+                    self.color = GRAY
+                else: 
+                    self.x += self.speed * math.cos(self.angle)
+                    self.y += self.speed * math.sin(self.angle)
 
-                if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
-                    self.angle = (self.angle + math.pi) % (2 * math.pi)
+                    if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
+                        self.angle = (self.angle + math.pi) % (2 * math.pi)
 
-                self.x = max(0, min(WIDTH, self.x))
-                self.y = max(0, min(HEIGHT, self.y))
+                    self.x = max(0, min(WIDTH, self.x))
+                    self.y = max(0, min(HEIGHT, self.y))
 
         def rotate_towards(self, target_x, target_y):
             target_angle = math.atan2(target_y - self.y, target_x - self.x)
