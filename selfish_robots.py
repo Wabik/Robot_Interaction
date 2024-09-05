@@ -3,13 +3,14 @@ import random
 import math
 import time
 import pandas as pd
+import os 
 
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time.csv"
 
 def run_simulation():
     pygame.init()
 
-    WIDTH, HEIGHT = 400,400
+    WIDTH, HEIGHT = 400, 400
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Robot Simulation")
 
@@ -19,11 +20,10 @@ def run_simulation():
     GREEN = (0, 255, 0)
     YELLOW = (255, 255, 0)
     GRAY = (169, 169, 169)
-    VIEW_COLOR = (200, 200, 200, 100)
 
     ROBOT_SIZE = 20
     SPEED = 2
-    BATTERY = 100.0
+    BATTERY = 100
     TURN_SPEED = 0.1
     VIEW_DISTANCE = 150
     VIEW_ANGLE = math.radians(76)
@@ -47,11 +47,12 @@ def run_simulation():
             self.battery_level = BATTERY
             self.identifier = identifier
             self.last_battery_update = time.time()
+            self.finish_time = None
 
         def battery(self):
             current_time = time.time()
             if current_time - self.last_battery_update >= 10:
-                self.battery_level = max(0, self.battery_level - 0.5)
+                self.battery_level = max(0, self.battery_level - 2)
                 self.last_battery_update = current_time
                 print(f"Battery level of {self.identifier} robot: {self.battery_level:.2f}")
                 vector_battery = round(self.battery_level, 2)
@@ -147,6 +148,8 @@ def run_simulation():
         Robot(300, 300, YELLOW, 'C')
     ]
 
+    entry_times = {}
+
     running = True
     clock = pygame.time.Clock()
 
@@ -176,6 +179,14 @@ def run_simulation():
             else:
                 robot.speed = 0
                 robot.active = False
+                
+                if robot.finish_time is None:
+                        robot.finish_time = round(time.time() - start_time,2)
+                        entry_times[robot.identifier] = robot.finish_time
+                        print(entry_times)                
+
+
+
             robot.draw()
 
         for i in range(len(robots)):
@@ -184,12 +195,48 @@ def run_simulation():
                     robots[i].avoid_collision(robots[j])
                     robots[j].avoid_collision(robots[i])
 
+
         if all_robots_in_safe_area:
             end_time = time.time()
             time_taken = end_time - start_time
             print(f"All robots have found the target in {time_taken:.2f} seconds!")
-            save_time_to_file(time_taken, FILE_PATH)
+            # save_time_to_file(time_taken, FILE_PATH)
             running = False
+            sorted_entry_times = sorted(entry_times.items(), key=lambda x: x[1])
+            first_robot = sorted_entry_times[0][0]
+            second_robot = sorted_entry_times[1][0]
+            third_robot = sorted_entry_times[2][0]
+
+            data = {
+                'Czas symulacji': [round(time_taken, 2)],
+                'Poziom baterii A': [robots[0].battery_level],
+                'Poziom baterii B': [robots[1].battery_level],
+                'Poziom baterii C': [robots[2].battery_level],
+                'Czas robota A': [entry_times.get('A', None)],
+                'Czas robota B': [entry_times.get('B', None)],
+                'Czas robota C': [entry_times.get('C', None)],
+                'Pierwszy robot': [first_robot],
+                'Drugi robot': [second_robot],
+                'Trzeci robot': [third_robot]
+            }
+
+            df = pd.DataFrame(data)
+
+            print(df)
+
+            if os.path.isfile(FILE_PATH):
+                column_names = False
+            else:
+                column_names = True
+
+            df.to_csv(FILE_PATH, mode='a', header=column_names, index=False)
+
+        # if all_robots_in_safe_area:
+        #     end_time = time.time()
+        #     time_taken = end_time - start_time
+        #     print(f"All robots have found the target in {time_taken:.2f} seconds!")
+        #     save_time_to_file(time_taken, FILE_PATH)
+        #     running = False
 
         pygame.display.flip()
         clock.tick(60)
