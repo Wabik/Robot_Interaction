@@ -18,11 +18,12 @@ def run_simulation():
     BLUE = (0, 0, 255)
     GREEN = (0, 255, 0)
     YELLOW = (255, 255, 0)
+    GRAY = (169, 169, 169)
     VIEW_COLOR = (200, 200, 200, 100)
 
     ROBOT_SIZE = 20
     SPEED = 2
-    BATTERY = 1.0
+    BATTERY = 100.0
     TURN_SPEED = 0.1
     VIEW_DISTANCE = 150
     VIEW_ANGLE = math.radians(76)
@@ -50,9 +51,9 @@ def run_simulation():
         def battery(self):
             current_time = time.time()
             if current_time - self.last_battery_update >= 10:
-                self.battery_level = max(0, self.battery_level - 0.01)
+                self.battery_level = max(0, self.battery_level - 0.5)
                 self.last_battery_update = current_time
-                print(f"Battery level of {self.color} robot: {self.battery_level:.2f}")
+                print(f"Battery level of {self.identifier} robot: {self.battery_level:.2f}")
                 vector_battery = round(self.battery_level, 2)
 
         def move(self):
