@@ -79,11 +79,19 @@ def run_simulation():
             end_angle1 = self.angle - VIEW_ANGLE / 2
             end_angle2 = self.angle + VIEW_ANGLE / 2
             points = [(self.x, self.y)]
-            for angle in [end_angle1, end_angle2]:
+            
+            num_points = 20
+            for i in range(num_points + 1):
+                angle = end_angle1 + i * (end_angle2 - end_angle1) / num_points
                 dx = self.x + VIEW_DISTANCE * math.cos(angle)
                 dy = self.y + VIEW_DISTANCE * math.sin(angle)
                 points.append((dx, dy))
-            pygame.draw.polygon(screen, VIEW_COLOR, points, 0)
+            
+            s = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            pygame.draw.polygon(s, (0, 0, 0, 50), points)
+            screen.blit(s, (0, 0))
+
+            pygame.draw.polygon(screen, (0, 0, 0), points, 1)  #1 definiuje gruboiść obramowania
             
         def is_in_safe_area(self):
             robot_rect = pygame.Rect(self.x - ROBOT_SIZE // 2, self.y - ROBOT_SIZE // 2, ROBOT_SIZE, ROBOT_SIZE)
@@ -169,7 +177,7 @@ def run_simulation():
 
     pygame.quit()
 
-for i in range(10):
-    print("Proba", i)
+for i in range(1):
+    print("Proba", i+1)
     run_simulation()
     pygame.time.wait(10)  
