@@ -195,7 +195,6 @@ def run_simulation():
                     robots[i].avoid_collision(robots[j])
                     robots[j].avoid_collision(robots[i])
 
-
         if all_robots_in_safe_area:
             end_time = time.time()
             time_taken = end_time - start_time
