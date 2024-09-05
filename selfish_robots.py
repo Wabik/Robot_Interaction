@@ -35,13 +35,14 @@ def run_simulation():
     ]
 
     class Robot:
-        def __init__(self, x, y, color):
+        def __init__(self, x, y, color, identifier):
             self.x = x
             self.y = y
             self.color = color
             self.angle = random.uniform(0, 2 * math.pi)
             self.speed = SPEED
             self.active = True
+            self.identifier = identifier
 
         def move(self):
             if self.active:
@@ -123,9 +124,9 @@ def run_simulation():
             print(f"Error saving to file: {e}")
 
     robots = [
-        Robot(100, 100, RED),
-        Robot(200, 200, BLUE),
-        Robot(300, 300, YELLOW)
+        Robot(100, 100, RED, 'A'),
+        Robot(200, 200, BLUE, 'B'),
+        Robot(300, 300, YELLOW, 'C')
     ]
 
     running = True
