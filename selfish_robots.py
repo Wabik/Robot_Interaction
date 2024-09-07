@@ -5,7 +5,7 @@ import time
 import pandas as pd
 import os 
 
-FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time.csv"
+FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time2.csv"
 
 def run_simulation():
     pygame.init()
@@ -174,7 +174,7 @@ def run_simulation():
                     robot.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                 else:
                     robot.rotate_randomly()
-                robot.move()
+                # robot.move()
                 all_robots_in_safe_area = False
             else:
                 robot.speed = 0
@@ -211,9 +211,9 @@ def run_simulation():
                 'Poziom baterii A': [robots[0].battery_level],
                 'Poziom baterii B': [robots[1].battery_level],
                 'Poziom baterii C': [robots[2].battery_level],
-                'Czas robota A': [entry_times.get('A', None)],
-                'Czas robota B': [entry_times.get('B', None)],
-                'Czas robota C': [entry_times.get('C', None)],
+                'Czas robota A': [entry_times.get('A')],
+                'Czas robota B': [entry_times.get('B')],
+                'Czas robota C': [entry_times.get('C')],
                 'Pierwszy robot': [first_robot],
                 'Drugi robot': [second_robot],
                 'Trzeci robot': [third_robot]
@@ -242,7 +242,7 @@ def run_simulation():
 
     pygame.quit()
 
-for i in range(1):
+for i in range(15):
     print("Proba", i+1)
     run_simulation()
-    pygame.time.wait(10)  
+    pygame.time.wait(5)  
