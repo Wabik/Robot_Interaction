@@ -6,7 +6,7 @@ import time
 import pandas as pd
 import numpy as np
 
-FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time.csv"
+FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time2.csv"
 
 def run_simulation():
 
@@ -468,9 +468,9 @@ def run_simulation():
                 'Poziom baterii A': [robots[0].battery_level],
                 'Poziom baterii B': [robots[1].battery_level],
                 'Poziom baterii C': [robots[2].battery_level],
-                'Czas robota A': [entry_times.get('A', None)],
-                'Czas robota B': [entry_times.get('B', None)],
-                'Czas robota C': [entry_times.get('C', None)],
+                'Czas robota A': [entry_times.get('A')],
+                'Czas robota B': [entry_times.get('B')],
+                'Czas robota C': [entry_times.get('C')],
                 'Pierwszy robot': [first_robot],
                 'Drugi robot': [second_robot],
                 'Trzeci robot': [third_robot]
@@ -499,7 +499,7 @@ def run_simulation():
     pygame.quit()
     # print_knowledge_summary(robots)
 
-for i in range(2):
-    print("Proba", i)
+for i in range(1):
+    print("Proba", i+1)
     run_simulation()
-    pygame.time.wait(10)  
+    pygame.time.wait(5)  
