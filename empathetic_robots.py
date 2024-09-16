@@ -389,9 +389,9 @@ def run_simulation():
             print(f"Error saving to file: {e}")
 
     robots = [
-        Robot(100, 100, RED, 'A'),
-        Robot(200, 200, RED, 'B'),
-        Robot(300, 300, RED, 'C'),
+        Robot(50, 150, RED, 'A'),
+        Robot(65, 250, RED, 'B'),
+        Robot(80, 350, RED, 'C'),
     ]
 
     entry_times = {}
