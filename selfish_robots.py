@@ -21,7 +21,7 @@ def run_simulation():
     YELLOW = (255, 255, 0)
     GRAY = (169, 169, 169)
 
-    ROBOT_SIZE = 20
+    ROBOT_SIZE = 16.4
     SPEED = 2
     BATTERY = 100
     TURN_SPEED = 0.1
@@ -92,7 +92,7 @@ def run_simulation():
             self.angle += random.uniform(-TURN_SPEED, TURN_SPEED)
 
         def draw(self):
-            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
+            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE / 2)
             self.draw_visibility_arc()
 
         def draw_visibility_arc(self):
