@@ -12,7 +12,7 @@ def run_simulation():
 
     pygame.init()
 
-    WIDTH, HEIGHT = 400, 400
+    WIDTH, HEIGHT = 300, 400
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Robot Simulation")
 
@@ -22,11 +22,11 @@ def run_simulation():
     GREEN = (0, 255, 0)
     GRAY = (169, 169, 169) 
 
-    ROBOT_SIZE = 20
+    ROBOT_SIZE = 16.4
     SPEED = 2
     BATTERY = 100
     TURN_SPEED = 0.1
-    VIEW_DISTANCE = 150
+    VIEW_DISTANCE = 200
     VIEW_ANGLE = math.radians(76)
     KNOWLEDGE = [[0.9,0.7,0.5,0,0,0], 
                             [0.5,0,0,0,0,0], 
@@ -157,7 +157,7 @@ def run_simulation():
             self.angle += random.uniform(-TURN_SPEED, TURN_SPEED)
 
         def draw(self):
-            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE // 2)
+            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), ROBOT_SIZE / 2)
             self.draw_visibility_arc()
             self.vector_to_edges()
             self.vector_to_target()
@@ -455,6 +455,7 @@ def run_simulation():
         if all_robots_in_safe_area:
             end_time = time.time()
             time_taken = end_time - start_time
+      
             print(f"All robots have found the target in {time_taken:.2f} seconds!")
             # save_time_to_file(time_taken, FILE_PATH)
             running = False
