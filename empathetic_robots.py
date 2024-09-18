@@ -101,7 +101,7 @@ def run_simulation():
                     target_robot = self.find_robot_to_follow(robots)
 
                     if self.can_see_target(target_x, target_y, TARGET_SIZE):
-                        # self.color = GREEN
+                        self.color = GREEN
                         self.see_target = True
                         self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                     elif target_robot:
@@ -398,6 +398,7 @@ def run_simulation():
     ]
 
     entry_times = {}
+    amount_of_knowledge = {} 
 
     running = True
     clock = pygame.time.Clock()
@@ -435,6 +436,8 @@ def run_simulation():
                         robot.finish_time = round(time.time() - start_time,2)
                         entry_times[robot.identifier] = robot.finish_time
                         print(entry_times)
+                        amount_of_knowledge[robot.identifier] = len(robot.knowledge)
+                        print("Knowledge", robot.identifier, len(robot.knowledge))
 
             robot.draw()
             
@@ -470,6 +473,10 @@ def run_simulation():
             second_robot = sorted_entry_times[1][0]
             third_robot = sorted_entry_times[2][0]
 
+            knowledge_A = amount_of_knowledge['A']
+            knowledge_B = amount_of_knowledge['B']
+            knowledge_C = amount_of_knowledge['C']
+
             data = {
                 'Czas symulacji': [round(time_taken, 2)],
                 'Poziom baterii A': [robots[0].battery_level],
@@ -481,6 +488,9 @@ def run_simulation():
                 'Pierwszy robot': [first_robot],
                 'Drugi robot': [second_robot],
                 'Trzeci robot': [third_robot], 
+                'Wiedza A': [knowledge_A],
+                'Wiedza B': [knowledge_B],
+                'Wiedza C': [knowledge_C],
                 'Zachowania empatyczne': [suma_empatycznych]
             }
 
