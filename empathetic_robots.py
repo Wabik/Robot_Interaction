@@ -9,7 +9,7 @@ import numpy as np
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time2.csv"
 
 def run_simulation():
-
+    
     pygame.init()
 
     WIDTH, HEIGHT = 300, 400
@@ -39,6 +39,7 @@ def run_simulation():
     REWARDS = [0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
 
     TARGET_SIZE = 100
+
     target_x, target_y = WIDTH - TARGET_SIZE, 0
 
     safe_areas = [
@@ -79,6 +80,7 @@ def run_simulation():
             self.last_battery_update = time.time()
             self.identifier = identifier
             self.finish_time = None
+            self.empatyczne = 0 
 
         def battery(self):
             current_time = time.time()
@@ -99,11 +101,12 @@ def run_simulation():
                     target_robot = self.find_robot_to_follow(robots)
 
                     if self.can_see_target(target_x, target_y, TARGET_SIZE):
-                        self.color = GREEN
+                        # self.color = GREEN
                         self.see_target = True
                         self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                     elif target_robot:
                         self.color = BLUE
+                        self.empatyczne = 1 
                         self.see_target = False
                         self.rotate_towards(target_robot.x, target_robot.y)
                     else:
@@ -457,6 +460,9 @@ def run_simulation():
             time_taken = end_time - start_time
       
             print(f"All robots have found the target in {time_taken:.2f} seconds!")
+            suma_empatycznych = sum(robot.empatyczne for robot in robots)
+            print("Suma empatyczna:", suma_empatycznych)
+
             # save_time_to_file(time_taken, FILE_PATH)
             running = False
             sorted_entry_times = sorted(entry_times.items(), key=lambda x: x[1])
@@ -474,7 +480,8 @@ def run_simulation():
                 'Czas robota C': [entry_times.get('C')],
                 'Pierwszy robot': [first_robot],
                 'Drugi robot': [second_robot],
-                'Trzeci robot': [third_robot]
+                'Trzeci robot': [third_robot], 
+                'Zachowania empatyczne': [suma_empatycznych]
             }
 
             df = pd.DataFrame(data)
