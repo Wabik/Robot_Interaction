@@ -100,10 +100,8 @@ for i in range(1):
                     self.active = False
                     self.color = GRAY
                 else:
-                    # Aktualizacja wiedzy robota przed ruchem
                     self.current_knowledge(robots)
 
-                    # Logika poruszania się robota
                     if self.can_see_target(target_x, target_y, TARGET_SIZE):
                         self.color = GREEN
                         self.see_target = True
@@ -120,17 +118,14 @@ for i in range(1):
                             self.see_target = False
                             self.rotate_randomly()
 
-                    # Aktualizacja pozycji robota
                     self.x += self.speed * math.cos(self.angle)
                     self.y += self.speed * math.sin(self.angle)
 
-                    # Zapobieganie wyjściu poza granice
                     if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
                         self.angle = (self.angle + math.pi) % (2 * math.pi)
                     self.x = max(0, min(WIDTH, self.x))
                     self.y = max(0, min(HEIGHT, self.y))
 
-                    # Aktualizacja nagrody po ruchu
                     self.current_rewards()
 
         def find_robot_to_follow(self, robots):
@@ -242,8 +237,6 @@ for i in range(1):
 
         def vector_to_target(self):
             distance = self.calculate_distance_to_target()
-            # if self.is_in_safe_area():
-            #     return None
 
             if distance < VIEW_DISTANCE:
                 vector_to_target = 1 - (distance / VIEW_DISTANCE)
@@ -353,7 +346,6 @@ for i in range(1):
             return 0  
 
         def evaluate_actions(self, new_state):
-                # Jeśli brak wcześniejszych stanów
                 if len(self.knowledge) == 0:
                     reward = self.calculate_reward(new_state, [], [])
                     self.knowledge.append(new_state)
@@ -372,7 +364,6 @@ for i in range(1):
                 self.knowledge.append(new_state)
                 self.rewards.append(reward)
                 self.analyzed_states_count +=1 
-
 
         def current_knowledge(self, robots):
             current_vectors = {
@@ -461,7 +452,6 @@ for i in range(1):
             if not robot.is_in_safe_area():
                 robot.move(robots)
                 robot.current_knowledge(robots)
-                # robot.current_reward()
 
                 all_robots_in_safe_area = False
 
@@ -487,13 +477,6 @@ for i in range(1):
             blue_ratio = robot.vector_blue_robot(robots)
             green_ratio = robot.vector_green_robot(robots)
 
-            # sees_green = vector_green_robot_vision(robot, robots)
-            # print(f"Robot at ({robot.x}, {robot.y}) sees a green robot: {sees_green}")
-            
-            # sees_blue = vector_blue_robot_vision(robot, robots)
-            # print(sees_blue)
-            # print(f"Robot at ({robot.x}, {robot.y}) sees a blue robot: {sees_blue}")
-
         for i in range(len(robots)):
             for j in range(i + 1, len(robots)):
                 if robots[i].active and robots[j].active and robots[i].check_collision(robots[j]):
@@ -508,7 +491,6 @@ for i in range(1):
             suma_empatycznych = sum(robot.empatyczne for robot in robots)
             print("Suma empatyczna:", suma_empatycznych)
 
-            # save_time_to_file(time_taken, FILE_PATH)
             running = False
             sorted_entry_times = sorted(entry_times.items(), key=lambda x: x[1])
             first_robot = sorted_entry_times[0][0]
@@ -550,12 +532,5 @@ for i in range(1):
         pygame.display.flip()
         clock.tick(60)
 
-    # def print_knowledge_summary(robots):
-    #     print("Knowledge Summary for Each Robot:")
-    #     for index, robot in enumerate(robots):
-    #         knowledge_count = len(robot.knowledge)
-    #         print(f"Robot {index + 1}): {knowledge_count} knowledge points")
-
     pygame.quit()
-    # print_knowledge_summary(robots)
     pygame.time.wait(5)  
