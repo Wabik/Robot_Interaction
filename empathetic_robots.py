@@ -6,7 +6,7 @@ import time
 import pandas as pd
 import numpy as np
 
-FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time2.csv"
+FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time.csv"
 
 for i in range(1):
     print("Proba", i+1)
