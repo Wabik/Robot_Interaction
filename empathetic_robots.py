@@ -83,25 +83,7 @@ for i in range(1):
             n = len(Aj)
             distance = np.sqrt(np.sum((np.array(Aj) - np.array(Ai))**2) / n)
             return 1 - distance
-        
-
-        # def similarity(self, Aj, Ai):
-        #     """Oblicza znormalizowane podobieństwo między dwoma stanami."""
-        #     # Normalizacja wektorów
-        #     Aj = np.array(Aj)
-        #     Ai = np.array(Ai)
-        #     Aj_norm = np.linalg.norm(Aj)
-        #     Ai_norm = np.linalg.norm(Ai)
-
-        #     if Aj_norm == 0 or Ai_norm == 0:
-        #         return 0
-
-        #     cosine_similarity = np.dot(Aj, Ai) / (Aj_norm * Ai_norm)
-        #     # Skalowanie do zakresu [0, 1]
-        #     normalized_similarity = (cosine_similarity + 1) / 2
-        #     return round(normalized_similarity,2)
-
-
+    
         def calculate_reward(self, Ai, A_list, r_list):
             m = len(A_list)
             weighted_sum = 0
