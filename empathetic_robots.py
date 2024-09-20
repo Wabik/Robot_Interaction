@@ -8,7 +8,8 @@ import numpy as np
 
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\empathetic_time2.csv"
 
-def run_simulation():
+for i in range(1):
+    print("Proba", i+1)
     
     pygame.init()
 
@@ -575,8 +576,4 @@ def run_simulation():
 
     pygame.quit()
     # print_knowledge_summary(robots)
-
-for i in range(1):
-    print("Proba", i+1)
-    run_simulation()
     pygame.time.wait(5)  
