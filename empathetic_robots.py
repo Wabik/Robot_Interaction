@@ -428,6 +428,7 @@ for i in range(1):
 
     entry_times = {}
     amount_of_knowledge = {}
+    number_of_omitted = {}
 
     running = True
     clock = pygame.time.Clock()
@@ -465,9 +466,10 @@ for i in range(1):
                         entry_times[robot.identifier] = robot.finish_time
                         print(entry_times)
                         amount_of_knowledge[robot.identifier] = len(robot.knowledge)
-                        print("Wiedza", robot.identifier, len(robot.knowledge))
-                        print("Zaakceptowane", len(robot.knowledge)-8 )
-                        print("Pominięte", robot.identifier, robot.skipped_states_count)
+                        number_of_omitted[robot.identifier] = robot.skipped_states_count
+                        # print("Wiedza", robot.identifier, len(robot.knowledge))
+                        # print("Zaakceptowane", len(robot.knowledge)-8 )
+                        # print("Pominięte", robot.identifier, robot.skipped_states_count)
                         total_states = robot.analyzed_states_count + robot.skipped_states_count
                         print("Procent", robot.identifier, round((robot.skipped_states_count/total_states)*100,2))
 
@@ -515,7 +517,10 @@ for i in range(1):
                 'Wiedza A': [knowledge_A],
                 'Wiedza B': [knowledge_B],
                 'Wiedza C': [knowledge_C],
-                'Zachowania empatyczne': [suma_empatycznych]
+                'Zachowania empatyczne': [suma_empatycznych],
+                'Pominięte stany A': [number_of_omitted.get('A')],
+                'Pominięte stany B': [number_of_omitted.get('B')],
+                'Pominięte stany C': [number_of_omitted.get('C')]
             }
 
             df = pd.DataFrame(data)
