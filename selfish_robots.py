@@ -5,7 +5,7 @@ import time
 import pandas as pd
 import os 
 
-FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time2.csv"
+FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time.csv"
 
 for i in range(1):
     print("Proba", i+1)
@@ -26,7 +26,7 @@ for i in range(1):
     SPEED = 2
     BATTERY = 100
     TURN_SPEED = 0.1
-    VIEW_DISTANCE = 150
+    VIEW_DISTANCE = 200
     VIEW_ANGLE = math.radians(76)
 
     TARGET_SIZE = 100
@@ -175,7 +175,7 @@ for i in range(1):
                     robot.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
                 else:
                     robot.rotate_randomly()
-                # robot.move()
+                robot.move()
                 all_robots_in_safe_area = False
             else:
                 robot.speed = 0
