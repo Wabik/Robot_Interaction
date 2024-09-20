@@ -37,6 +37,7 @@ def run_simulation():
                             [0.3,0,0,0.5,0.9,0],
                             [0.7,0.5,0.5,1,0.6,0.3]]
     REWARDS = [0.9,0.3,0.6,0.7,1,0.1,0.5, 0.8]
+    SIMILARITY_THRESHOLD = 0.96 
 
     TARGET_SIZE = 100
 
@@ -46,21 +47,6 @@ def run_simulation():
         pygame.Rect(target_x, 0, WIDTH - target_x, 5),
         pygame.Rect(WIDTH-5, 0, 5, 100)
     ]
-
-    # Funkcja obliczająca podobieństwo między dwoma zbiorami rozmytymi
-    def similarity(Aj, Ai):
-        n = len(Aj)
-        distance = np.sqrt(np.sum((np.array(Aj) - np.array(Ai))**2) / n)
-        return 1 - distance
-
-    # Funkcja obliczająca ocenę stanu na podstawie podobieństwa do innych stanów
-    def calculate_reward(Ai, A_list, r_list):
-        m = len(A_list)
-        weighted_sum = 0
-        for j in range(m):
-            s_ij = similarity(A_list[j], Ai)
-            weighted_sum += s_ij * r_list[j]
-        return weighted_sum / m
 
     class Robot:
         def __init__(self, x, y, color, identifier):
@@ -80,7 +66,9 @@ def run_simulation():
             self.last_battery_update = time.time()
             self.identifier = identifier
             self.finish_time = None
-            self.empatyczne = 0 
+            self.empatyczne = 0    
+            self.skipped_states_count = 0 
+            self.analyzed_states_count = 0
 
         def battery(self):
             current_time = time.time()
@@ -90,6 +78,37 @@ def run_simulation():
                 print(f"Battery level of {self.identifier} robot: {self.battery_level:.2f}")
                 vector_battery = round(self.battery_level, 2)
 
+        def similarity(self, Aj, Ai):
+            n = len(Aj)
+            distance = np.sqrt(np.sum((np.array(Aj) - np.array(Ai))**2) / n)
+            return 1 - distance
+        
+
+        # def similarity(self, Aj, Ai):
+        #     """Oblicza znormalizowane podobieństwo między dwoma stanami."""
+        #     # Normalizacja wektorów
+        #     Aj = np.array(Aj)
+        #     Ai = np.array(Ai)
+        #     Aj_norm = np.linalg.norm(Aj)
+        #     Ai_norm = np.linalg.norm(Ai)
+
+        #     if Aj_norm == 0 or Ai_norm == 0:
+        #         return 0
+
+        #     cosine_similarity = np.dot(Aj, Ai) / (Aj_norm * Ai_norm)
+        #     # Skalowanie do zakresu [0, 1]
+        #     normalized_similarity = (cosine_similarity + 1) / 2
+        #     return round(normalized_similarity,2)
+
+
+        def calculate_reward(self, Ai, A_list, r_list):
+            m = len(A_list)
+            weighted_sum = 0
+            for j in range(m):
+                s_ij = self.similarity(A_list[j], Ai)
+                weighted_sum += s_ij * r_list[j]
+            return weighted_sum / m
+
         def move(self, robots):
             if self.active:
                 self.battery()
@@ -98,30 +117,38 @@ def run_simulation():
                     self.active = False
                     self.color = GRAY
                 else:
-                    target_robot = self.find_robot_to_follow(robots)
+                    # Aktualizacja wiedzy robota przed ruchem
+                    self.current_knowledge(robots)
 
+                    # Logika poruszania się robota
                     if self.can_see_target(target_x, target_y, TARGET_SIZE):
                         self.color = GREEN
                         self.see_target = True
                         self.rotate_towards(target_x + TARGET_SIZE // 2, target_y + TARGET_SIZE // 2)
-                    elif target_robot:
-                        self.color = BLUE
-                        self.empatyczne = 1 
-                        self.see_target = False
-                        self.rotate_towards(target_robot.x, target_robot.y)
                     else:
-                        self.color = self.base_color
-                        self.see_target = False
-                        self.rotate_randomly()
+                        target_robot = self.find_robot_to_follow(robots)
+                        if target_robot:
+                            self.color = BLUE
+                            self.empatyczne = 1
+                            self.see_target = False
+                            self.rotate_towards(target_robot.x, target_robot.y)
+                        else:
+                            self.color = self.base_color
+                            self.see_target = False
+                            self.rotate_randomly()
 
+                    # Aktualizacja pozycji robota
                     self.x += self.speed * math.cos(self.angle)
                     self.y += self.speed * math.sin(self.angle)
 
+                    # Zapobieganie wyjściu poza granice
                     if self.x < 0 or self.x > WIDTH or self.y < 0 or self.y > HEIGHT:
                         self.angle = (self.angle + math.pi) % (2 * math.pi)
-
                     self.x = max(0, min(WIDTH, self.x))
                     self.y = max(0, min(HEIGHT, self.y))
+
+                    # Aktualizacja nagrody po ruchu
+                    self.current_rewards()
 
         def find_robot_to_follow(self, robots):
             for other in robots:
@@ -339,8 +366,29 @@ def run_simulation():
         def vector_green_robot(self, robots):
             nearest_green_robot, distance = self.find_nearest_robot_of_color(robots, GREEN)
             if nearest_green_robot:
-                return 1 - (distance / VIEW_DISTANCE)
-            return 0  # 
+                return round(1 - (distance / VIEW_DISTANCE),2)
+            return 0  
+
+        def evaluate_actions(self, new_state):
+                # Jeśli brak wcześniejszych stanów
+                if len(self.knowledge) == 0:
+                    reward = self.calculate_reward(new_state, [], [])
+                    self.knowledge.append(new_state)
+                    self.rewards.append(reward)
+                    return
+
+                
+                for existing_state in self.knowledge:
+                    similarity_value = self.similarity(existing_state, new_state)
+                    if similarity_value > SIMILARITY_THRESHOLD:
+                        # print(f"State {new_state} is too similar to an existing state, skipping evaluation.")
+                        self.skipped_states_count += 1
+                        return
+                
+                reward = self.calculate_reward(new_state, self.knowledge, self.rewards)
+                self.knowledge.append(new_state)
+                self.rewards.append(reward)
+                self.analyzed_states_count +=1 
 
 
         def current_knowledge(self, robots):
@@ -355,15 +403,22 @@ def run_simulation():
             # print("Wiedza", current_vectors)
             self.current_stage = list(current_vectors.values())
             # print("Obecny stan", self.current_stage)
-            reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
+            reward = self.calculate_reward(self.current_stage, self.knowledge, self.rewards)
             self.current_reward = reward
             # print("Obecna nagroda", round(self.current_reward,2))
 
-        # def current_rewards(self,robots):
-        #     reward = calculate_reward(self.current_stage, self.knowledge, self.rewards)
-        #     self.current_reward = reward
-        #     print("Obecna nagroda", self.current_reward)
-    
+            self.current_stage = list(current_vectors.values())
+            # print("Obecny stan", self.current_stage)
+
+            # Przeprowadzamy ocenę działań na podstawie obecnego stanu
+            self.evaluate_actions(self.current_stage)
+
+        # Funkcja do aktualizacji nagrody na podstawie bieżącego stanu
+        def current_rewards(self):
+            reward = self.calculate_reward(self.current_stage, self.knowledge, self.rewards)
+            self.current_reward = reward
+            # print(f"Obecna nagroda: {round(self.current_reward, 2)}")
+
         def check_collision(self, other):
             distance = math.hypot(self.x - other.x, self.y - other.y)
             return distance < ROBOT_SIZE
@@ -398,7 +453,7 @@ def run_simulation():
     ]
 
     entry_times = {}
-    amount_of_knowledge = {} 
+    amount_of_knowledge = {}
 
     running = True
     clock = pygame.time.Clock()
@@ -437,7 +492,11 @@ def run_simulation():
                         entry_times[robot.identifier] = robot.finish_time
                         print(entry_times)
                         amount_of_knowledge[robot.identifier] = len(robot.knowledge)
-                        print("Knowledge", robot.identifier, len(robot.knowledge))
+                        print("Wiedza", robot.identifier, len(robot.knowledge))
+                        print("Zaakceptowane", len(robot.knowledge)-8 )
+                        print("Pominięte", robot.identifier, robot.skipped_states_count)
+                        total_states = robot.analyzed_states_count + robot.skipped_states_count
+                        print("Procent", robot.identifier, round((robot.skipped_states_count/total_states)*100,2))
 
             robot.draw()
             
