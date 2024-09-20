@@ -7,7 +7,8 @@ import os
 
 FILE_PATH = "j:\\Desktop\\Robot_Interaction\\selfish_time2.csv"
 
-def run_simulation():
+for i in range(1):
+    print("Proba", i+1)
     pygame.init()
 
     WIDTH, HEIGHT = 300, 400
@@ -241,8 +242,4 @@ def run_simulation():
         clock.tick(60)
 
     pygame.quit()
-
-for i in range(1):
-    print("Proba", i+1)
-    run_simulation()
     pygame.time.wait(5)  
